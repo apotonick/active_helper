@@ -1,0 +1,22 @@
+h1. ActiveHelper
+
+_Finally - helpers with proper encapsulation, delegation, interfaces and inheritance!_
+
+
+h2. Introduction
+
+Helpers suck. They have been always sucking, and they will suck on if we keep them in modules.
+
+ActiveHelper is an attempt to pack helpers into classes. This brings us a few benefits
+
+* *inheritance* helpers can be derived from more abstract helpers
+* *delegation* helpers are no longer mixed into a target- the target class @uses@ the helper, where the new 
+methods are _delegated_ to the helper class
+* *proper encapsulation* blindly mixin' in pollutes the target, whereas delegation doesn't 
+* *interfaces* a helper clearly @provides@ methods and eventually @uses@ additional helpers 
+
+h2. Example
+
+
+<pre>
+</pre>
