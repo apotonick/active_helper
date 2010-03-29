@@ -1,7 +1,7 @@
 require File.dirname(__FILE__) + '/test_helper'
 
 class ActiveHelperTest < Test::Unit::TestCase
-  context "#helper_methods" do
+  context "#helper_methods and #provides" do
     setup do
       @helper = Class.new(::ActiveHelper::Base).new
     end
@@ -24,18 +24,61 @@ class ActiveHelperTest < Test::Unit::TestCase
     end
   end
   
-  context "Helper instances calling #uses" do
+  context "#uses on Helper" do
     setup do
+      assert_respond_to ::ActiveHelper::Base, :uses
       @helper = Class.new(::ActiveHelper::Base).new
-    end
-    
-    should "respond to the new delegated Helper methods" do
+      assert_respond_to @helper.class, :uses
       assert ! @helper.respond_to?(:eat)
       
-      class A < ::ActiveHelper::Base; provides :eat; end
+      class GreedyHelper < ::ActiveHelper::Base; provides :eat; end
+    end
+    
+    context "instances" do
+      should "respond to the new delegated Helper methods" do
+        @helper.uses GreedyHelper
+        assert_respond_to @helper, :eat
+      end
       
-      @helper.uses A
-      assert_respond_to @helper, :eat
+      should "be aliased to #use" do
+        @helper.use GreedyHelper
+        assert_respond_to @helper, :eat
+      end
+    end
+    
+    context "classes" do
+      should "respond to the new delegated Helper methods" do
+        @helper.class.uses GreedyHelper
+        assert_respond_to @helper, :eat
+      end
+    end
+  end
+  
+  context "#uses on non-helpers" do
+    setup do
+      @target_class = Class.new(Object) # don't pollute Object directly.
+      @target_class.instance_eval { include ::ActiveHelper }
+      assert_respond_to @target_class, :uses
+      
+      @target = @target_class.new
+      assert ! @target.respond_to?(:eat)
+      
+      class GreedyHelper < ::ActiveHelper::Base; provides :eat; end
+    end
+    
+    context "instances" do
+      should "respond to the new delegated helper methods" do
+        @target.uses GreedyHelper
+        assert_respond_to @target, :eat
+      end
+    end
+    
+    context "classes" do
+      should "respond to the new delegated helper methods" do
+        puts "using uses on #{@target.class}"
+        @target.class.uses GreedyHelper
+        assert_respond_to @target, :eat
+      end
     end
   end
 end
