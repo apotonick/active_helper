@@ -6,6 +6,9 @@ module ActiveHelper
     class_inheritable_array :parent_readers
     self.parent_readers = []
     
+    class_inheritable_array :class_helpers
+    self.class_helpers = []
+    
     class << self
       # Add public methods to the helper's interface. Only methods listed here will 
       # be used to expand the target.
@@ -16,21 +19,25 @@ module ActiveHelper
       def needs(*methods)
         parent_readers.push(*methods).uniq!
       end
+      
+      def uses(*classes)
+        class_helpers.push(*classes).uniq!
+      end
     end
     
     
-    include ::ActiveHelper
+    include GenericMethods
     attr_reader :parent
     
     def initialize(parent=nil)
       @parent = parent
       extend SingleForwardable
       add_parent_readers!
+      add_class_helpers!
     end
     
-    # Expands only the Helper instance itself, not the class.
-    def use(*args)
-      uses(*args)
+    def use(helper_class)
+      use_for(helper_class, parent) # in GenericMethods.
     end
     
     protected
@@ -38,6 +45,10 @@ module ActiveHelper
       def add_parent_readers!
         return if @parent.blank? or self.class.parent_readers.blank?
         def_delegator(:@parent, self.class.parent_readers) if @parent
+      end
+      
+      def add_class_helpers!
+        self.class.class_helpers.each { |helper| use helper }
       end
   end
 end
