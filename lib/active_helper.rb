@@ -30,25 +30,6 @@ module ActiveHelper
   def use (helper_class)
     use_for(helper_class, self)
   end
-  
-  
-   
-  module ExpandedClassMethods
-    def uses(helper_class)
-    extend ::Forwardable
-    
-    helper_ivar_name = ivar_name_for(helper_class)
-    
-    instance_variable_set(helper_ivar_name, helper_class.new) 
-    helper_class.helper_methods.each do |meth|
-      def_delegator helper_ivar_name, meth
-    end
-  end
-  end
-  
-  def self.included(base)
-    base.extend ::ActiveHelper::ExpandedClassMethods
-  end
 end
 
 require 'active_helper/base'

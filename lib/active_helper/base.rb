@@ -44,7 +44,7 @@ module ActiveHelper
       # Delegates methods declared with #needs back to parent.
       def add_parent_readers!
         return if @parent.blank? or self.class.parent_readers.blank?
-        def_delegator(:@parent, self.class.parent_readers) if @parent
+        def_delegator(:@parent, self.class.parent_readers)
       end
       
       def add_class_helpers!

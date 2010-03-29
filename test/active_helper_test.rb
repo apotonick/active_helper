@@ -205,7 +205,7 @@ class ActiveHelperTest < Test::Unit::TestCase
     setup do
       @target_class = Class.new(Object) # don't pollute Object directly.
       @target_class.instance_eval { include ::ActiveHelper }
-      assert_respond_to @target_class, :uses
+      assert_respond_to @target_class, :use
       
       @target = @target_class.new
       assert ! @target.respond_to?(:eat)
@@ -225,25 +225,25 @@ class ActiveHelperTest < Test::Unit::TestCase
       end
     end
     
-    context "#uses" do
-      should "delegate new delegated helper methods" do
-        @target.class.uses GreedyHelper
-        assert_respond_to @target, :eat
-      end
-      
-      should "inherit helper methods to non-helper class" do
-        class DiningHelper < ::ActiveHelper::Base
-          provides :drink
-          uses GreedyHelper
-          
-          def drink;end
-        end
-        
-        @helper = Class.new(DiningHelper).new
-        assert_respond_to @helper, :eat   # from uses GreedyHelper.
-        assert_respond_to @helper, :drink # from DiningHelper inheritance.
-      end
-    end
+    #context "#uses" do
+    #  should "delegate new delegated helper methods" do
+    #    @target.class.uses GreedyHelper
+    #    assert_respond_to @target, :eat
+    #  end
+    #  
+    #  should "inherit helper methods to non-helper class" do
+    #    class DiningHelper < ::ActiveHelper::Base
+    #      provides :drink
+    #      uses GreedyHelper
+    #      
+    #      def drink;end
+    #    end
+    #    
+    #    @helper = Class.new(DiningHelper).new
+    #    assert_respond_to @helper, :eat   # from uses GreedyHelper.
+    #    assert_respond_to @helper, :drink # from DiningHelper inheritance.
+    #  end
+    #end
   end
   
   context "#ivar_name_for" do

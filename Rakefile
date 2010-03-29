@@ -7,7 +7,7 @@ require File.join(File.dirname(__FILE__), 'lib', 'active_helper', 'version')
 desc 'Default: run unit tests.'
 task :default => :test
 
-desc 'Test the onfire library.'
+desc 'Test the active_helper library.'
 Rake::TestTask.new(:test) do |test|
   test.libs << ['lib', 'test']
   test.pattern = 'test/*_test.rb'
@@ -44,7 +44,7 @@ begin
   Jeweler::Tasks.new do |spec|
     spec.name         = "active_helper"
     spec.version      = ::ActiveHelper::VERSION
-    spec.summary      = %{Finally - helpers with proper encapsulation, delegation and inheritance!}
+    spec.summary      = %{Finally - helpers with proper encapsulation, delegation, interfaces and inheritance!}
     spec.description  = spec.summary
     spec.homepage     = "http://github.com/apotonick/active_helper"
     spec.authors      = ["Nick Sutterer"]
@@ -52,7 +52,7 @@ begin
 
     spec.files = FileList["[A-Z]*", File.join(*%w[{lib,test} ** *]).to_s]
 
-    # spec.add_dependency 'activesupport', '>= 2.3.0' # Dependencies and minimum versions?
+    spec.add_dependency 'activesupport', '>= 2.3.0' # Dependencies and minimum versions?
   end
 
   Jeweler::GemcutterTasks.new
