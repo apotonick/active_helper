@@ -5,18 +5,181 @@ _Finally - helpers with proper encapsulation, delegation, interfaces and inherit
 
 h2. Introduction
 
-Helpers suck. They have been always sucking, and they will suck on if we keep them in modules.
+Helpers suck. They've always sucked, and they will suck on if we keep them in modules.
 
-ActiveHelper is an attempt to pack helpers into classes. This brings us a few benefits
+ActiveHelper is an attempt to pack helpers into *classes*. This brings us a few benefits
 
-* *inheritance* helpers can be derived from more abstract helpers
-* *delegation* helpers are no longer mixed into a target- the target class @uses@ the helper, where the new 
-methods are _delegated_ to the helper class
-* *proper encapsulation* blindly mixin' in pollutes the target, whereas delegation doesn't 
-* *interfaces* a helper clearly @provides@ methods and eventually @uses@ additional helpers 
+* *inheritance* helpers can be derived other helpers
+* *delegation* helpers are no longer mixed into a target- the targets @use@ the helper, where the new 
+methods are _delegated_ to the helper instances
+* *proper encapsulation* helpers don't rely blindly on instance variables - a helper defines its @needs@, the target has to provide readers
+* *interfaces* a helper clearly @provides@ methods and might @use@ additional helpers 
+
+Note that ActiveHelper is a generic helper framework not coupled to anything like Rails or Merb. Feel free to use clean helpers _everywhere_ in your projects (including Rails and friends)!
 
 h2. Example
 
+Let's use the bloody MVC-View example as we can find it in Rails or Merb (Sinatra, too?).
+
+We have a view which needs additional methods in order to render bullshit.
+
+
+h3. Using helpers
+
+The view wants to render tags using the TagHelper.
 
 <pre>
+class View
+  include ActiveHelper
+end
+
+> view.use TagHelper
 </pre>
+
+To pull-in ("import") a helper we invoke @use@ on the target instance.
+
+
+h3. Interfaces
+
+The exemplary _tag_ method took me days to implement. 
+
+<pre>
+class TagHelper < ActiveHelper::Base
+  provides :tag
+  
+  def tag(name, attributes="")
+    "<#{name} #{attributes}>"
+  end
+end
+</pre>
+
+The helper defines a part of its interface (what goes out) as it @provides@ methods.
+
+<pre>
+> view.tag(:form)       # => "<form>"
+</pre>
+
+
+h3. Inheritance
+
+The real power of OOP is inheritance, so why should we throw away that in favor of modules?
+
+<pre>
+class FormHelper < TagHelper
+  provides :form_tag
+  
+  def form_tag(destination)
+    tag(:form, "action=#{destination}")
+  end
+end
+</pre>
+
+That's _a bit_ cleaner than blindly including 30 helper modules in another helper in another helper.
+
+<pre>
+> view.use FormHelper
+> view.tag(:form)               # => "<form>"
+> view.form('apotomo.de')       # => "<form action=apotomo.de>"
+</pre>
+
+Obviously the view can invoke stuff from the FormHelper itself and also provided methods from its ancestors.
+
+h3. Delegation as Multiple Inheritance
+
+What if the _#form_tag_ method needs to access another method from another helper? In Rails, this would simply be
+
+<pre>
+  def form_tag(destination)
+    destination = url_for(destination)
+    tag(:form, "action=#{destination}")
+  end
+</pre>
+
+The _#url_for_ methods comes from, na, do you know it? Me neither! It's mixed-in somewhere in the depths of the helper modules.
+
+In ActiveHelper this is slightly different.
+
+<pre>
+class FormHelper < TagHelper
+  provides :form_tag
+  uses UrlHelper
+  
+  def form_tag(destination)
+    destination = url_for(destination)  # in UrlHelper.
+    tag(:form, "action=#{destination}")
+  end
+end
+</pre>
+
+Hmm, our _FormHelper_ is already derived from _ActiveHelper_, how do we import additional methods?
+
+Easy as well, the helper class @uses@ it.
+
+So we have to know _#url_for_ is located in the _UrlHelper_ and we even have to declare our helper @uses@ the other one.
+That's a good thing for a) *code tidiness*, b) *good architecture* and c) *debugging*.
+
+How does the _UrlHelper_ look like?
+
+
+h3. Delegation as Interface
+
+A traditional url helper would roughly look like this:
+
+<pre>
+  def url_for(url)
+    protocol = @https_request? ? 'https' : 'http'
+    "#{protocol}://#{url}"
+  end
+</pre>
+
+Next chance, who or what did create _@https_request?_ and where does it live?
+
+Our helper bets on declaring its interface, again! This time we define what comes in. 
+
+<pre>
+class UrlHelper < ActiveHelper::Base
+  provides  :url_for
+  needs     :https_request?
+  
+  def url_for(url)
+    protocol = https_request? ? 'https' : 'http'
+    "#{protocol}://#{url}"
+  end
+end
+</pre>
+
+It tells us what it @needs@ and that's all for it. Any call to _#https_request?_ (that's a /method/) is strictly delegated back to the target, that's the view and the view alone has to care.
+
+That's what happens in productive mode.
+
+<pre>
+> view.form('apotomo.de')
+# => 11:in `url_for': undefined method `https_request?' for #<View:0xb749d4fc> (NoMethodError)
+</pre>
+
+That's conclusive, the view is insufficiently geared.
+
+<pre>
+class View
+  include ActiveHelper
+  
+  def https_request?; false; end
+end
+</pre>
+
+Now, does it work?
+
+<pre>
+> view.form_tag('go.and.use/active_helper')
+# => <form action=http://go.and.use/active_helper>
+</pre>
+
+Yeah.
+
+h2. Concepts
+* no raw @ivar access in helpers (although they could, when defined in the constructor)
+* model dependencies with OOP strategies: inheritance! AND #needs ?????
+
+helpers are usually pushed into _instances_, if you don't want that, go and have fun with modules. (or use delegation on class "layer" with #uses)
+
+h2. Terminology
