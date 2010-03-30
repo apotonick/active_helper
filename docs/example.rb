@@ -5,10 +5,10 @@ require 'active_helper'
 
 class UrlHelper < ActiveHelper::Base
   provides  :url_for
-  needs     :controller
+  needs     :https_request?
   
   def url_for(url)
-    protocol = controller.https? ? 'https' : 'http'
+    protocol = https_request? ? 'https' : 'http'
     "#{protocol}://#{url}"
   end
 end
@@ -31,14 +31,13 @@ class FormHelper < TagHelper
   end
 end
 
-class WebController
+class View
   include ActiveHelper
   
-  def controller; self;   end
-  def https?;     false;  end
+  def https_request?; false; end
 end
 
-controller = WebController.new
+controller = View.new
 
 controller.use TagHelper
 puts controller.tag('b')
@@ -47,4 +46,4 @@ controller.use UrlHelper
 puts controller.url_for('yo')
 
 controller.use FormHelper
-puts controller.form_tag('apotomo.de')
+puts controller.form_tag('go.and.use/active_helper')

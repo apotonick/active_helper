@@ -15,11 +15,11 @@ methods are _delegated_ to the helper instances
 * *proper encapsulation* helpers don't rely blindly on instance variables - a helper defines its @needs@, the target has to provide readers
 * *interfaces* a helper clearly @provides@ methods and might @use@ additional helpers 
 
-Note that ActiveHelper is a generic helper framework not coupled to anything like Rails or Merb. Feel free to use clean helpers _everywhere_ in your projects (including Rails and friends)!
+Note that ActiveHelper is a generic helper framework. Not coupled to anything like Rails or Merb. Not providing any concrete helpers. Feel free to use clean helpers in _any_ framework (including Rails and friends)!
 
 h2. Example
 
-Let's use the bloody MVC-View example as we can find it in Rails or Merb (Sinatra, too?).
+Let's use the bloody MVC-View example as we find in Rails or Merb (Sinatra, too?).
 
 We have a view which needs additional methods in order to render bullshit.
 
@@ -41,7 +41,7 @@ To pull-in ("import") a helper we invoke @use@ on the target instance.
 
 h3. Interfaces
 
-The exemplary _tag_ method took me days to implement. 
+The exemplary _#tag_ method took me days to implement. 
 
 <pre>
 class TagHelper < ActiveHelper::Base
@@ -69,12 +69,12 @@ class FormHelper < TagHelper
   provides :form_tag
   
   def form_tag(destination)
-    tag(:form, "action=#{destination}")
+    tag(:form, "action=#{destination}") # inherited from TagHelper.
   end
 end
 </pre>
 
-That's _a bit_ cleaner than blindly including 30 helper modules in another helper in another helper.
+That's _a bit_ cleaner than blindly including 30 helper modules in another helper in another helper, isn't it?
 
 <pre>
 > view.use FormHelper
@@ -82,11 +82,11 @@ That's _a bit_ cleaner than blindly including 30 helper modules in another helpe
 > view.form('apotomo.de')       # => "<form action=apotomo.de>"
 </pre>
 
-Obviously the view can invoke stuff from the FormHelper itself and also provided methods from its ancestors.
+Obviously the view can invoke stuff from the _FormHelper_ itself and inherited methods that were exposed with @provides@.
 
 h3. Delegation as Multiple Inheritance
 
-What if the _#form_tag_ method needs to access another method from another helper? In Rails, this would simply be
+What if the _#form_tag_ method needs to access another helper? In Rails, this would simply be
 
 <pre>
   def form_tag(destination)
@@ -115,10 +115,10 @@ Hmm, our _FormHelper_ is already derived from _ActiveHelper_, how do we import a
 
 Easy as well, the helper class @uses@ it.
 
-So we have to know _#url_for_ is located in the _UrlHelper_ and we even have to declare our helper @uses@ the other one.
+So we have to know _#url_for_ is located in the _UrlHelper_ and we even have to declare our helper @uses@ another one.
 That's a good thing for a) *code tidiness*, b) *good architecture* and c) *debugging*.
 
-How does the _UrlHelper_ look like?
+How would the _UrlHelper_ look like?
 
 
 h3. Delegation as Interface
@@ -132,9 +132,9 @@ A traditional url helper would roughly look like this:
   end
 </pre>
 
-Next chance, who or what did create _@https_request?_ and where does it live?
+Next chance, who or what did create _@https_request?_ and where does it live? That's _ugly_, boys!
 
-Our helper bets on declaring its interface, again! This time we define what comes in. 
+Our helper bets on declaring its interface, again! This time we define what goes in (a "dependency").
 
 <pre>
 class UrlHelper < ActiveHelper::Base
@@ -148,9 +148,9 @@ class UrlHelper < ActiveHelper::Base
 end
 </pre>
 
-It tells us what it @needs@ and that's all for it. Any call to _#https_request?_ (that's a /method/) is strictly delegated back to the target, that's the view and the view alone has to care.
+It defines what it @needs@ and that's all for it. Any call to _#https_request?_ (that's a _method_) is strictly delegated back to the view instance, which has to care about satisfying dependencies.
 
-That's what happens in productive mode.
+Here's what happens in productive mode.
 
 <pre>
 > view.form('apotomo.de')
@@ -177,9 +177,12 @@ Now, does it work?
 Yeah.
 
 h2. Concepts
-* no raw @ivar access in helpers (although they could, when defined in the constructor)
-* model dependencies with OOP strategies: inheritance! AND #needs ?????
+* Helpers are instances, when accessing a raw @@ivar@ it refers to their own instance variables
+* Dependencies between different helpers and between the target (e.g. a _View_ instance) are modelled with OOP strategies: Inheritance and the declarative @#needs@.
+* Naturally helpers can @use@ other helpers on instance level, a helper class @uses@ supporting helpers.
 
-helpers are usually pushed into _instances_, if you don't want that, go and have fun with modules. (or use delegation on class "layer" with #uses)
+h2. License
 
-h2. Terminology
+Copyright (c) 2010, Nick Sutterer 
+
+Released under the MIT License.
