@@ -17,6 +17,13 @@ methods are _delegated_ to the helper instances
 
 Note that ActiveHelper is a generic helper framework. Not coupled to anything like Rails or Merb. Not providing any concrete helpers. Feel free to use clean helpers in _any_ framework (including Rails and friends)!
 
+h2. Installation
+
+<pre>
+> gem install active_helper
+</pre>
+
+
 h2. Example
 
 Let's use the bloody MVC-View example as we find in Rails or Merb (Sinatra, too?).
