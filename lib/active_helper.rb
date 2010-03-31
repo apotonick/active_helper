@@ -17,7 +17,7 @@ module ActiveHelper
     end
     
     protected
-      # Unique ivar name for the helper class in the expanding target.
+      # Unique ivar name for the helper instance in the expanding target.
       def ivar_name_for(object)
         ('@__active_helper_'+("#{object.to_s}".underscore.gsub(/[\/<>@#:]/, ""))).to_sym
       end

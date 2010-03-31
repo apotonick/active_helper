@@ -17,7 +17,9 @@ module ActiveHelper
       end
       
       def needs(*methods)
+        
         parent_readers.push(*methods).uniq!
+        puts parent_readers.inspect
       end
       
       def uses(*classes)
@@ -32,8 +34,8 @@ module ActiveHelper
     def initialize(parent=nil)
       @parent = parent
       extend SingleForwardable
-      add_parent_readers!
-      add_class_helpers!
+      delegate_parent_readers!
+      use_class_helpers!
     end
     
     def use(helper_class)
@@ -42,12 +44,13 @@ module ActiveHelper
     
     protected
       # Delegates methods declared with #needs back to parent.
-      def add_parent_readers!
+      def delegate_parent_readers!
         return if @parent.blank? or self.class.parent_readers.blank?
-        def_delegator(:@parent, self.class.parent_readers)
+        def_delegator(:@parent, *self.class.parent_readers)
       end
       
-      def add_class_helpers!
+      # Imports foreign methods from other use'd helpers.
+      def use_class_helpers!
         self.class.class_helpers.each { |helper| use helper }
       end
   end
