@@ -11,17 +11,39 @@ module ActiveHelper
     
     class << self
       # Add public methods to the helper's interface. Only methods listed here will 
-      # be used to expand the target.
+      # be imported into the target.
+      #
+      # Example:
+      #   class UrlHelper < ActiveHelper::Base
+      #     provides :url_for, :link_to
       def provides(*methods)
         helper_methods.push(*methods)
       end
       
+      # Define a dependency to another ActiveHelper. All provided methods by the needed
+      # helper will be imported into the helper that called needs.
+      #
+      # Example:
+      #   class UrlHelper < ActiveHelper::Base
+      #     needs TagHelper
+      #
+      # will import #tag into UrlHelper.
       def needs(*methods)
-        
         parent_readers.push(*methods).uniq!
-        puts parent_readers.inspect
       end
       
+      # Define a dependency to methods in target. Calls to that methods will be delegated
+      # simply back to target.
+      #
+      # Note: This can also be used to call a helper method from a non-ActiveHelper, which
+      # was preliminary included in target.
+      #
+      # Example:
+      #   class UrlHelper < ActiveHelper::Base
+      #     uses controller
+      #
+      # will deletegate calls to #controller to target (i.e. the view instance that #use's 
+      # UrlHelper).
       def uses(*classes)
         class_helpers.push(*classes).uniq!
       end
@@ -33,20 +55,20 @@ module ActiveHelper
     
     def initialize(parent=nil)
       @parent = parent
-      extend SingleForwardable
+      setup_delegator_strategy! # in GenericMethods.
       delegate_parent_readers!
       use_class_helpers!
     end
     
-    def use(helper_class)
-      use_for(helper_class, parent) # in GenericMethods.
+    def use(*classes)
+      use_for(classes, parent) # in GenericMethods.
     end
     
     protected
       # Delegates methods declared with #needs back to parent.
       def delegate_parent_readers!
         return if @parent.blank? or self.class.parent_readers.blank?
-        def_delegator(:@parent, *self.class.parent_readers)
+        delegate_methods_to(self.class.parent_readers, :@parent)  # in GenericMethods.
       end
       
       # Imports foreign methods from other use'd helpers.

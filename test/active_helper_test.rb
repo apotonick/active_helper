@@ -1,6 +1,15 @@
 require File.dirname(__FILE__) + '/test_helper'
 
 class ActiveHelperTest < Test::Unit::TestCase
+  class GreedyHelper < ::ActiveHelper::Base
+    provides :eat
+  end
+  
+  class ThirstyHelper < ::ActiveHelper::Base
+    provides :drink, :booze
+  end
+  
+  
   def helper_mock(*args)
     Class.new(::ActiveHelper::Base).new(*args)
   end
@@ -136,7 +145,7 @@ class ActiveHelperTest < Test::Unit::TestCase
       assert_respond_to @helper.class, :uses
       assert ! @helper.respond_to?(:eat)
       
-      class GreedyHelper < ::ActiveHelper::Base; provides :eat; end
+      
     end
     
     context "#use" do
@@ -151,6 +160,20 @@ class ActiveHelperTest < Test::Unit::TestCase
         @helper.use GreedyHelper
         assert_equal @target, helper_in(GreedyHelper, @helper).parent # parent of used handler is target, not the using handler!
       end
+      
+      should "accept multiple helper classes" do
+        @helper.use GreedyHelper, ThirstyHelper
+        assert_respond_to @helper, :eat
+        assert_respond_to @helper, :drink
+        assert_respond_to @helper, :booze
+      end
+      
+      should "accept empty helpers with no methods" do
+        @empty_helper = helper_mock
+        @helper.use  @empty_helper.class
+        assert helper_in(@empty_helper.class, @helper)
+      end
+      
     end
     
     context "#uses" do    
@@ -209,8 +232,6 @@ class ActiveHelperTest < Test::Unit::TestCase
       
       @target = @target_class.new
       assert ! @target.respond_to?(:eat)
-      
-      class GreedyHelper < ::ActiveHelper::Base; provides :eat; end
     end
     
     context "#use" do
@@ -222,6 +243,13 @@ class ActiveHelperTest < Test::Unit::TestCase
       should "set @parent => @target in the used Helper" do
         @target.use GreedyHelper
         assert_equal @target, helper_in(GreedyHelper, @target).parent
+      end
+      
+      should "accept multiple helper classes" do
+        @target.use GreedyHelper, ThirstyHelper
+        assert_respond_to @target, :eat
+        assert_respond_to @target, :drink
+        assert_respond_to @target, :booze
       end
     end
     
