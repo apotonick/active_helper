@@ -46,6 +46,8 @@ class RailsTest < ActionController::TestCase
   context "The view rendered by the controller" do
     should "respond to used helper methods" do
       @controller = BeerController.new
+      @controller.class.active_helper ThirstyHelper
+      
       get 'drink'
       
       @view = @controller.response.template

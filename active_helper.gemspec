@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Nick Sutterer"]
-  s.date = %q{2010-04-01}
+  s.date = %q{2010-04-09}
   s.description = %q{Finally - helpers with proper encapsulation, delegation, interfaces and inheritance!}
   s.email = %q{apotonick@gmail.com}
   s.extra_rdoc_files = [
@@ -20,8 +20,12 @@ Gem::Specification.new do |s|
      "Rakefile",
      "lib/active_helper.rb",
      "lib/active_helper/base.rb",
+     "lib/active_helper/rails.rb",
      "lib/active_helper/version.rb",
+     "rails/init.rb",
      "test/active_helper_test.rb",
+     "test/helpers/helpers.rb",
+     "test/rails_test.rb",
      "test/test_helper.rb"
   ]
   s.homepage = %q{http://github.com/apotonick/active_helper}
@@ -31,7 +35,9 @@ Gem::Specification.new do |s|
   s.summary = %q{Finally - helpers with proper encapsulation, delegation, interfaces and inheritance!}
   s.test_files = [
     "test/test_helper.rb",
-     "test/active_helper_test.rb"
+     "test/active_helper_test.rb",
+     "test/rails_test.rb",
+     "test/helpers/helpers.rb"
   ]
 
   if s.respond_to? :specification_version then

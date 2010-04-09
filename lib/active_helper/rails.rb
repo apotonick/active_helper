@@ -8,12 +8,10 @@ class ActionController::Base
     # your template.
     #
     # Example:
-    #   require 'active_helpers/thirsty_helper'
-    #   
     #   class BeerController < ActionController::Base
     #     active_helper ThirstyHelper
     #
-    # Note that the helper file currently is not loaded automatically.
+    # The helper file usually resides in app/active_helpers/, baby.
     def active_helper(*classes)
       active_helpers.push(*classes).uniq!
     end
@@ -21,7 +19,7 @@ class ActionController::Base
   
   def initialize_template_class_with_active_helper(response)
     initialize_template_class_without_active_helper(response)
-    response.template.use ThirstyHelper
+    response.template.use *self.class.active_helpers
   end
   
   alias_method_chain :initialize_template_class, :active_helper
@@ -30,3 +28,5 @@ end
 class ActionView::Base
   include ActiveHelper
 end
+
+ActiveSupport::Dependencies.load_paths << Rails.root.join(*%w[app active_helpers]) if defined?(Rails)

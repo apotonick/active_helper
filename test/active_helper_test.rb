@@ -1,15 +1,6 @@
 require File.dirname(__FILE__) + '/test_helper'
 
 class ActiveHelperTest < Test::Unit::TestCase
-  class GreedyHelper < ::ActiveHelper::Base
-    provides :eat
-  end
-  
-  class ThirstyHelper < ::ActiveHelper::Base
-    provides :drink, :booze
-  end
-  
-  
   def helper_mock(*args)
     Class.new(::ActiveHelper::Base).new(*args)
   end
