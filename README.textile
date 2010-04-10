@@ -183,6 +183,38 @@ Now, does it work?
 
 Yeah.
 
+h2. Rails Bindings
+
+Use ActiveHelper in your Rails app! Assuming you'd be writing a helper for text munging, you would
+
+1. Write your helper and put it in @app/active_helpers/text_munging_helper.rb@.
+
+<pre>
+class TextMungingHelper < ActiveHelper::Base
+  provides :munge
+  
+  def munge(text)
+    text.rot13
+  end
+end
+</pre>
+
+2. Prepare your controller.
+
+<pre>
+class StupidController < ActionController::Base
+  active_helper TextMungingHelper
+</pre>
+
+3. Use the imported methods in your views, just as you know it from other helpers.
+
+<pre>
+<p>
+  Your Email is <%= munge @user.email %>.
+</p>
+</pre>
+
+
 h2. Concepts
 * Helpers are instances, when accessing a raw @@ivar@ it refers to their own instance variables
 * Dependencies between different helpers and between the target (e.g. a _View_ instance) are modelled with OOP strategies: Inheritance and the declarative @#needs@.
