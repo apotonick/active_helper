@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{active_helper}
-  s.version = "0.1.1"
+  s.version = "0.2.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Nick Sutterer"]
-  s.date = %q{2010-04-09}
+  s.date = %q{2010-04-10}
   s.description = %q{Finally - helpers with proper encapsulation, delegation, interfaces and inheritance!}
   s.email = %q{apotonick@gmail.com}
   s.extra_rdoc_files = [
@@ -34,9 +34,9 @@ Gem::Specification.new do |s|
   s.rubygems_version = %q{1.3.6}
   s.summary = %q{Finally - helpers with proper encapsulation, delegation, interfaces and inheritance!}
   s.test_files = [
-    "test/test_helper.rb",
+    "test/rails_test.rb",
      "test/active_helper_test.rb",
-     "test/rails_test.rb",
+     "test/test_helper.rb",
      "test/helpers/helpers.rb"
   ]
 
