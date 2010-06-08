@@ -1,5 +1,6 @@
 require File.dirname(__FILE__) + '/test_helper'
 
+gem 'actionpack', '~>2.3'
 require 'action_controller'
 require 'action_view'
 require 'active_helper/rails' # usually happens in active_helper.rb
