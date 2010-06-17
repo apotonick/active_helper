@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + '/test_helper'
 
-gem 'actionpack', '~>2.3'
+gem 'actionpack', '~>3.0'
 require 'action_controller'
 require 'action_view'
 require 'active_helper/rails' # usually happens in active_helper.rb
@@ -8,10 +8,6 @@ require 'active_helper/rails' # usually happens in active_helper.rb
 class BeerController < ActionController::Base
   def drink
   end
-end
-
-ActionController::Routing::Routes.draw do |map|
-  map.connect 'beer/:action', :controller => 'beer'
 end
 
 
@@ -45,6 +41,11 @@ class RailsTest < ActionController::TestCase
   end
   
   context "The view rendered by the controller" do
+    setup do
+      @routes = ActionDispatch::Routing::RouteSet.new
+      @routes.draw { |map| map.connect ':controller/:action/:id' }
+    end
+    
     should "respond to used helper methods" do
       @controller = BeerController.new
       @controller.class.active_helper ThirstyHelper

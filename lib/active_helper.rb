@@ -1,5 +1,5 @@
-gem 'activesupport', '~>2.3'
-require 'active_support'
+gem 'activesupport', '= 3.0.0.beta3'
+require 'active_support/core_ext'
 require 'forwardable'
 
 
