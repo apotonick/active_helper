@@ -2,7 +2,7 @@
 require 'rake'
 require 'rake/testtask'
 require 'rake/rdoctask'
-require File.join(File.dirname(__FILE__), 'lib', 'active_helper', 'version')
+require File.join(File.dirname(__FILE__), 'lib', 'active_helper')
 
 desc 'Default: run unit tests.'
 task :default => :test

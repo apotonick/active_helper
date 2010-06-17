@@ -60,9 +60,10 @@ module ActiveHelper
       use_class_helpers!
     end
     
-    def use(*classes)
+    def import(*classes)
       use_for(classes, parent) # in GenericMethods.
     end
+    alias_method :use, :import
     
     protected
       # Delegates methods declared with #needs back to parent.

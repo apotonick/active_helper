@@ -4,6 +4,8 @@ require 'forwardable'
 
 
 module ActiveHelper
+  VERSION = '0.2.1'
+  
   module GenericMethods
     def use_for(classes, target)
       classes.each do |helper_class|
@@ -45,9 +47,35 @@ module ActiveHelper
   #
   #   view = View.new
   #   view.use UrlHelper, DataMapperHelper
-  def use (*classes)
+  def import(*classes)
     setup_delegator_strategy!
     use_for(classes, self)
+  end
+  alias_method :use, :import
+  
+  module ClassMethods
+    include GenericMethods
+    
+    # Imports the provided methods from +classes+ into the target (the receiver).
+    # All imported helper methods in the target will be delegated back to the helpers.
+    #
+    # Example:
+    #   class View
+    #     uses UrlHelper, DataMapperHelper
+    #   end
+    def import(*classes)
+      setup_delegator_strategy!
+      use_for(classes, self)
+    end
+    
+    protected
+      def setup_delegator_strategy!
+        extend Forwardable
+      end
+  end
+  
+  def self.included(base)
+    base.extend ClassMethods
   end
 end
 
