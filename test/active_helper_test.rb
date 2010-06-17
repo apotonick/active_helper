@@ -39,12 +39,12 @@ class ActiveHelperTest < Test::Unit::TestCase
       should "delegate the method to the parent when called" do
         @helper_class.instance_eval { needs :bottle }
         @helper = @helper_class.new(@target)
-        @target.use @helper.class
+        @target.import @helper.class
         
         assert_equal "cheers!", @helper.bottle
       end
       
-      # DiningHelper.use GreedyHelper
+      # DiningHelper.import GreedyHelper
       #
       # GreedyHelper
       #   needs :bottle
@@ -56,14 +56,14 @@ class ActiveHelperTest < Test::Unit::TestCase
         @greedy_class.instance_eval { needs :bottle }
         
         @dining = helper_mock(@target)
-        @dining.use @greedy_class
+        @dining.import @greedy_class
         
         assert_equal 'cheers!', helper_in(@greedy_class, @dining).bottle
       end
     end
   end
   
-  context "With #parent_readers and #uses," do
+  context "With #parent_readers and #import," do
     setup do
       @target = Object.new
       @target.class.instance_eval { include ::ActiveHelper }
@@ -131,29 +131,29 @@ class ActiveHelperTest < Test::Unit::TestCase
   
   context "On a Helper" do
     setup do
-      assert_respond_to ::ActiveHelper::Base, :uses
+      assert_respond_to ::ActiveHelper::Base, :import
       @helper = Class.new(::ActiveHelper::Base).new
-      assert_respond_to @helper.class, :uses
+      assert_respond_to @helper.class, :import
       assert ! @helper.respond_to?(:eat)
       
       
     end
     
-    context "#use" do
+    context "#import" do
       should "delegate the new Helper methods" do
-        @helper.use GreedyHelper
+        @helper.import GreedyHelper
         assert_respond_to @helper, :eat
       end
       
       should "set @parent => @target in the used Helper" do
         @target = Object.new
         @helper = Class.new(::ActiveHelper::Base).new(@target)
-        @helper.use GreedyHelper
+        @helper.import GreedyHelper
         assert_equal @target, helper_in(GreedyHelper, @helper).parent # parent of used handler is target, not the using handler!
       end
       
       should "accept multiple helper classes" do
-        @helper.use GreedyHelper, ThirstyHelper
+        @helper.import GreedyHelper, ThirstyHelper
         assert_respond_to @helper, :eat
         assert_respond_to @helper, :drink
         assert_respond_to @helper, :booze
@@ -161,7 +161,7 @@ class ActiveHelperTest < Test::Unit::TestCase
       
       should "accept empty helpers with no methods" do
         @empty_helper = helper_mock
-        @helper.use  @empty_helper.class
+        @helper.import  @empty_helper.class
         assert helper_in(@empty_helper.class, @helper)
       end
       
@@ -196,14 +196,14 @@ class ActiveHelperTest < Test::Unit::TestCase
       end
       
       should "respond to the new delegated Helper methods" do
-        @helper.class.uses GreedyHelper
+        @helper.class.import GreedyHelper
         assert_respond_to @helper.class.new, :eat
       end
       
       should "inherit helper methods to ancestors" do
         class DiningHelper < ::ActiveHelper::Base
           provides :drink
-          uses GreedyHelper
+          import GreedyHelper
           
           def drink;end
         end
@@ -219,39 +219,39 @@ class ActiveHelperTest < Test::Unit::TestCase
     setup do
       @target_class = Class.new(Object) # don't pollute Object directly.
       @target_class.instance_eval { include ::ActiveHelper }
-      assert_respond_to @target_class, :use
+      assert_respond_to @target_class, :import
       
       @target = @target_class.new
       assert ! @target.respond_to?(:eat)
     end
     
-    context "#use" do
+    context "#import" do
       should "delegate new delegated helper methods" do
-        @target.use GreedyHelper
+        @target.import GreedyHelper
         assert_respond_to @target, :eat
       end
       
       should "set @parent => @target in the used Helper" do
-        @target.use GreedyHelper
+        @target.import GreedyHelper
         assert_equal @target, helper_in(GreedyHelper, @target).parent
       end
       
       should "accept multiple helper classes" do
-        @target.use GreedyHelper, ThirstyHelper
+        @target.import GreedyHelper, ThirstyHelper
         assert_respond_to @target, :eat
         assert_respond_to @target, :drink
         assert_respond_to @target, :booze
       end
     end
     
-    context "#uses" do
+    context "Class#import" do
       should "delegate helper methods" do
-        @target.class.uses GreedyHelper
+        @target.class.import GreedyHelper
         assert_respond_to @target, :eat
       end
       
       should "accept multiple helper classes" do
-        @target.class.uses GreedyHelper, ThirstyHelper
+        @target.class.import GreedyHelper, ThirstyHelper
         assert_respond_to @target, :eat
         assert_respond_to @target, :drink
         assert_respond_to @target, :booze

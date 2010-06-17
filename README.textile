@@ -10,10 +10,10 @@ Helpers suck. They've always sucked, and they will suck on if we keep them in mo
 ActiveHelper is an attempt to pack helpers into *classes*. This brings us a few benefits
 
 * *inheritance* helpers can be derived other helpers
-* *delegation* helpers are no longer mixed into a target- the targets @use@ the helper, where the new 
+* *delegation* helpers are no longer mixed into a target- the targets @import@ the helper, where the new 
 methods are _delegated_ to the helper instances
 * *proper encapsulation* helpers don't rely blindly on instance variables - a helper defines its @needs@, the target has to provide readers
-* *interfaces* a helper clearly @provides@ methods and might @use@ additional helpers 
+* *interfaces* a helper clearly @provides@ methods and might @import@ additional helpers 
 
 Note that ActiveHelper is a generic helper framework. Not coupled to anything like Rails or Merb. Not providing any concrete helpers. Feel free to use clean helpers in _any_ framework (including Rails and friends)!
 
@@ -38,12 +38,14 @@ The view wants to render tags using the TagHelper.
 <pre>
 class View
   include ActiveHelper
+  import TagHelper
 end
 
-> view.use TagHelper
 </pre>
 
-To pull-in ("import") a helper we invoke @use@ on the target instance.
+To pull-in a helper we invoke @import@ in the target class.
+
+Note that you can also use @import@ on an object to limit the helper's scope to that instance, only.
 
 
 h3. Interfaces
@@ -84,7 +86,7 @@ end
 That's _a bit_ cleaner than blindly including 30 helper modules in another helper in another helper, isn't it?
 
 <pre>
-> view.use FormHelper
+> view.import FormHelper
 > view.tag(:form)               # => "<form>"
 > view.form('apotomo.de')       # => "<form action=apotomo.de>"
 </pre>
@@ -109,7 +111,7 @@ In ActiveHelper this is slightly different.
 <pre>
 class FormHelper < TagHelper
   provides :form_tag
-  uses UrlHelper
+  import UrlHelper
   
   def form_tag(destination)
     destination = url_for(destination)  # in UrlHelper.
@@ -120,9 +122,9 @@ end
 
 Hmm, our _FormHelper_ is already derived from _ActiveHelper_, how do we import additional methods?
 
-Easy as well, the helper class @uses@ it.
+Easy as well, the helper class @import@s it.
 
-So we have to know _#url_for_ is located in the _UrlHelper_ and we even have to declare our helper @uses@ another one.
+So we have to know _#url_for_ is located in the _UrlHelper_ and we even have to @import@ that one.
 That's a good thing for a) *code tidiness*, b) *good architecture* and c) *debugging*.
 
 How would the _UrlHelper_ look like?
@@ -218,7 +220,6 @@ class StupidController < ActionController::Base
 h2. Concepts
 * Helpers are instances, when accessing a raw @@ivar@ it refers to their own instance variables
 * Dependencies between different helpers and between the target (e.g. a _View_ instance) are modelled with OOP strategies: Inheritance and the declarative @#needs@.
-* Naturally helpers can @use@ other helpers on instance level, a helper class @uses@ supporting helpers.
 
 h2. License
 
