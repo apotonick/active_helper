@@ -1,6 +1,7 @@
 require File.dirname(__FILE__) + '/test_helper'
 
-gem 'actionpack', '~>3.0'
+#gem 'actionpack', '~>3.0'
+require 'action_pack'
 require 'action_controller'
 require 'action_view'
 require 'active_helper/rails' # usually happens in active_helper.rb
@@ -42,8 +43,14 @@ class RailsTest < ActionController::TestCase
   
   context "The view rendered by the controller" do
     setup do
-      @routes = ActionDispatch::Routing::RouteSet.new
-      @routes.draw { |map| map.connect ':controller/:action/:id' }
+      if ActionPack::VERSION::MAJOR == 3
+        @routes = ActionDispatch::Routing::RouteSet.new
+        @routes.draw { |map| map.connect ':controller/:action/:id' }
+      else
+        ActionController::Routing::Routes.draw do |map|
+          map.connect 'beer/:action', :controller => 'beer'
+        end
+      end
     end
     
     should "respond to used helper methods" do

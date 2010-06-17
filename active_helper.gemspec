@@ -30,7 +30,7 @@ Gem::Specification.new do |s|
   s.homepage = %q{http://github.com/apotonick/active_helper}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
-  s.rubygems_version = %q{1.3.5}
+  s.rubygems_version = %q{1.3.6}
   s.summary = %q{Finally - helpers with proper encapsulation, delegation, interfaces and inheritance!}
   s.test_files = [
     "test/rails_test.rb",

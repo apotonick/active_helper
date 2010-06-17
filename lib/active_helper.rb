@@ -1,10 +1,9 @@
-gem 'activesupport', '= 3.0.0.beta3'
 require 'active_support/core_ext'
 require 'forwardable'
 
 
 module ActiveHelper
-  VERSION = '0.2.1'
+  VERSION = '0.2.2'
   
   module GenericMethods
     def use_for(classes, target)
