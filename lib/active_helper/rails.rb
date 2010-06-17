@@ -19,7 +19,7 @@ class ActionController::Base
   
   def initialize_template_class_with_active_helper(response)
     initialize_template_class_without_active_helper(response)
-    response.template.use *self.class.active_helpers
+    response.template.import *self.class.active_helpers
   end
   
   alias_method_chain :initialize_template_class, :active_helper
