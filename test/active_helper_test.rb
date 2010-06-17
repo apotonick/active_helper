@@ -244,25 +244,19 @@ class ActiveHelperTest < Test::Unit::TestCase
       end
     end
     
-    #context "#uses" do
-    #  should "delegate new delegated helper methods" do
-    #    @target.class.uses GreedyHelper
-    #    assert_respond_to @target, :eat
-    #  end
-    #  
-    #  should "inherit helper methods to non-helper class" do
-    #    class DiningHelper < ::ActiveHelper::Base
-    #      provides :drink
-    #      uses GreedyHelper
-    #      
-    #      def drink;end
-    #    end
-    #    
-    #    @helper = Class.new(DiningHelper).new
-    #    assert_respond_to @helper, :eat   # from uses GreedyHelper.
-    #    assert_respond_to @helper, :drink # from DiningHelper inheritance.
-    #  end
-    #end
+    context "#uses" do
+      should "delegate helper methods" do
+        @target.class.uses GreedyHelper
+        assert_respond_to @target, :eat
+      end
+      
+      should "accept multiple helper classes" do
+        @target.class.uses GreedyHelper, ThirstyHelper
+        assert_respond_to @target, :eat
+        assert_respond_to @target, :drink
+        assert_respond_to @target, :booze
+      end
+    end
   end
   
   context "#ivar_name_for" do
