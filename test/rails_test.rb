@@ -8,6 +8,7 @@ require 'active_helper/rails' # usually happens in active_helper.rb
 
 class BeerController < ActionController::Base
   def drink
+    render :inline => "<%= booze %>"
   end
 end
 
@@ -59,8 +60,7 @@ class RailsTest < ActionController::TestCase
       
       get 'drink'
       
-      @view = @controller.response.template
-      assert_respond_to @view, :booze # from the ThirstyHelper
+      assert_equal 'booze', @response.body
     end
   end
 end

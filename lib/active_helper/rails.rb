@@ -22,7 +22,15 @@ class ActionController::Base
     response.template.import *self.class.active_helpers
   end
   
-  alias_method_chain :initialize_template_class, :active_helper
+  def view_context_with_active_helper
+    view_context = view_context_without_active_helper
+    view_context.import *self.class.active_helpers
+    view_context
+  end
+  
+  
+  alias_method_chain :initialize_template_class, :active_helper if ActionPack::VERSION::MAJOR == 2
+  alias_method_chain :view_context, :active_helper              if ActionPack::VERSION::MAJOR == 3
 end
 
 class ActionView::Base
