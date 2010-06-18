@@ -195,7 +195,7 @@ class ActiveHelperTest < Test::Unit::TestCase
         end
       end
       
-      should "respond to the new delegated Helper methods" do
+      should_eventually "respond to the new delegated Helper methods" do
         @helper.class.import GreedyHelper
         assert_respond_to @helper.class.new, :eat
       end
@@ -203,7 +203,7 @@ class ActiveHelperTest < Test::Unit::TestCase
       should "inherit helper methods to ancestors" do
         class DiningHelper < ::ActiveHelper::Base
           provides :drink
-          import GreedyHelper
+          uses GreedyHelper
           
           def drink;end
         end
@@ -245,16 +245,30 @@ class ActiveHelperTest < Test::Unit::TestCase
     end
     
     context "Class#import" do
-      should "delegate helper methods" do
+      should_eventually "save the helper instance in a class ivar" do
+        klass = Class.new do
+          include ActiveHelper
+          import GreedyHelper
+        end
+        
+        assert_kind_of GreedyHelper, helper_in(GreedyHelper, klass)
+        assert_equal 'eat', klass.new.eat
+      end
+      
+      should_eventually "delegate helper methods" do
         @target.class.import GreedyHelper
         assert_respond_to @target, :eat
       end
       
-      should "accept multiple helper classes" do
+      should_eventually "accept multiple helper classes" do
         @target.class.import GreedyHelper, ThirstyHelper
         assert_respond_to @target, :eat
         assert_respond_to @target, :drink
         assert_respond_to @target, :booze
+        
+        assert_equal 'eat',   @target.eat
+        assert_equal 'drink', @target.drink
+        assert_equal 'booze', @target.booze
       end
     end
   end

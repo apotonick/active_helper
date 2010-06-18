@@ -38,15 +38,13 @@ The view wants to render tags using the TagHelper.
 <pre>
 class View
   include ActiveHelper
-  import TagHelper
 end
 
+> view = View.new
+> view.import TagHelper
 </pre>
 
-To pull-in a helper we invoke @import@ in the target class.
-
-Note that you can also use @import@ on an object to limit the helper's scope to that instance, only.
-
+To pull-in a helper we invoke @import@ on the target instance.
 
 h3. Interfaces
 
@@ -111,7 +109,7 @@ In ActiveHelper this is slightly different.
 <pre>
 class FormHelper < TagHelper
   provides :form_tag
-  import UrlHelper
+  uses UrlHelper
   
   def form_tag(destination)
     destination = url_for(destination)  # in UrlHelper.
@@ -122,9 +120,9 @@ end
 
 Hmm, our _FormHelper_ is already derived from _ActiveHelper_, how do we import additional methods?
 
-Easy as well, the helper class @import@s it.
+Easy as well, the helper class @uses@ it.
 
-So we have to know _#url_for_ is located in the _UrlHelper_ and we even have to @import@ that one.
+So we have to know _#url_for_ is located in the _UrlHelper_ and we even have to define which helpers it @uses@.
 That's a good thing for a) *code tidiness*, b) *good architecture* and c) *debugging*.
 
 How would the _UrlHelper_ look like?

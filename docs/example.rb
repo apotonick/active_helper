@@ -33,17 +33,18 @@ end
 
 class View
   include ActiveHelper
+  #import TagHelper
   
   def https_request?; false; end
 end
 
 controller = View.new
 
-controller.use TagHelper
+controller.import TagHelper
 puts controller.tag('b')
 
-controller.use UrlHelper
+controller.import UrlHelper
 puts controller.url_for('yo')
 
-controller.use FormHelper
+controller.import FormHelper
 puts controller.form_tag('go.and.use/active_helper')

@@ -3,7 +3,7 @@ require 'forwardable'
 
 
 module ActiveHelper
-  VERSION = '0.2.2'
+  VERSION = '0.2.3'
   
   module GenericMethods
     def use_for(classes, target)
@@ -45,7 +45,7 @@ module ActiveHelper
   #   end
   #
   #   view = View.new
-  #   view.use UrlHelper, DataMapperHelper
+  #   view.import UrlHelper, DataMapperHelper
   def import(*classes)
     setup_delegator_strategy!
     use_for(classes, self)
@@ -62,9 +62,14 @@ module ActiveHelper
     #   class View
     #     uses UrlHelper, DataMapperHelper
     #   end
+    #
+    # NOTE: This behaviour is not implemented, yet.
     def import(*classes)
       setup_delegator_strategy!
       use_for(classes, self)
+      # the problem here is that use_for sets the wrong target - the class instance, and not the instance itself.
+      # this will lead to problems when a helper needs :method. :method will be called on the class, not on 
+      # the instance, which is wrong.
     end
     
     protected
@@ -73,9 +78,10 @@ module ActiveHelper
       end
   end
   
-  def self.included(base)
-    base.extend ClassMethods
-  end
+  # TODO: how can we delegate to the helper in the class instance but set the importing instance as target?
+  #def self.included(base)
+  #  base.extend ClassMethods
+  #end
 end
 
 require 'active_helper/base'
